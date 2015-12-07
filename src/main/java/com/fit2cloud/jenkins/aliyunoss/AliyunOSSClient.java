@@ -39,6 +39,25 @@ public class AliyunOSSClient {
 		return true;
 	}
 	
+	public static String getContentType(String filename) {
+		if (filename.endsWith(".js")) {
+			return "application/javascript";
+		} else if (filename.endsWith(".json")) {
+			return "application/json";
+		} else if (filename.endsWith(".jpeg") || filename.endsWith(".jpeg")) {
+			return "image/jpeg";
+		} else if (filename.endsWith(".css")) {
+			return "text/css";
+		} else if (filename.endsWith(".png")) {
+			return "image/png";
+		} else if (filename.endsWith(".html")) {
+			return "text/html";
+		} else {
+			return "application/octet-stream";
+		}
+		
+	}
+	
 	public static int upload(AbstractBuild<?, ?> build, BuildListener listener,
 			final String aliyunAccessKey, final String aliyunSecretKey, final String aliyunEndPointSuffix, String bucketName,String expFP,String expVP) throws AliyunOSSException {
 		OSSClient client = new OSSClient(aliyunAccessKey, aliyunSecretKey);
@@ -111,7 +130,9 @@ public class AliyunOSSClient {
 						InputStream inputStream = src.read();
 						try {
 							ObjectMetadata meta = new ObjectMetadata();
+							String contentType = getContentType(src.getName());
 							meta.setContentLength(src.length());
+							meta.setContentType(contentType);
 							client.putObject(bucketName, key, inputStream, meta);
 						} finally {
 							try {
